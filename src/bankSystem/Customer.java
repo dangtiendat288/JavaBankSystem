@@ -8,10 +8,6 @@ public class Customer {
 	private String password;	
 	private ArrayList<BankAccount> accounts = new ArrayList<>();
 	
-	public Customer(String name) {
-		username = name;		
-	}
-	
 	public Customer(String name, String password) {
 		username = name;
 		this.password = password;		
@@ -72,10 +68,11 @@ public class Customer {
 		return false;
 	}
 	
-	public boolean transfer(int amount, int from, int to) {
+	public boolean transfer(float amount, int from, int to) {
 		BankAccount sender = accounts.get(from);
 		BankAccount receiver = accounts.get(to);
 		if(amount > sender.getBalance()) {
+			System.out.println("Insufficient fund. Transfer unsuccesfully!");
 			return false;
 		} else {
 			sender.withdraw(amount);

@@ -1,5 +1,7 @@
 package bankSystem;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,16 +11,54 @@ import java.sql.Statement;
 
 import java.util.*;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 public class Main {
 	static ArrayList<BankAccount> bankAccounts = new ArrayList<>();
 	static Customer currentCustomer;
 	static Connection currentConn;
+	static JFrame frame;
 	
 	public static void main(String[] args) throws Exception {			
 		Connection connection;
 		String jdbcURL = "jdbc:postgresql://localhost:5432/customer";
 		String username = "postgres";
 		String password = "meomeomeo123";
+		
+		
+		JLabel lbUsername = new JLabel("Username");
+		lbUsername.setBounds(20, 0, 75, 75);
+		
+//		JLabel lbPassword = new JLabel("Password");
+//		lbUsername.setBounds(40, 0, 75, 75);
+		
+		JPanel firstPanel = new JPanel();
+		firstPanel.setBackground(Color.RED);
+		firstPanel.setBounds(0, 0, 420, 140);
+		firstPanel.add(lbUsername);
+//		firstPanel.add(lbPassword);
+		firstPanel.setLayout(new BorderLayout());
+		
+//		JPanel secondPanel = new JPanel();
+//		secondPanel.setBackground(Color.BLUE);
+//		secondPanel.setBounds(0, 140, 420, 140);
+//		secondPanel.add(lbPassword);
+//		secondPanel.setLayout(new BorderLayout());
+		
+		frame = new JFrame();
+		frame.setTitle("TD Bank");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(null);
+//		frame.setResizable(false);
+		frame.setSize(420,420);
+		frame.setVisible(true);		
+		frame.add(firstPanel);
+//		frame.add(secondPanel);
+//		frame.add(lbUsername);
+		
+//		frame.pack();
 		
 		try {
 			connection = DriverManager.getConnection(jdbcURL, username, password);
@@ -40,10 +80,10 @@ public class Main {
 			
 			if(login("Minnie.Nguyen","54321")) {
 				System.out.println(currentCustomer.toString());
-				bankAccounts = getAccounts();
-				for(BankAccount ba : bankAccounts) {
-					System.out.println(ba.toString());
-				}
+//				bankAccounts = getAccounts();
+//				for(BankAccount ba : bankAccounts) {
+//					System.out.println(ba.toString());
+//				}
 			}
 			
 //			BankAccount a = getAccount(1);
@@ -54,12 +94,12 @@ public class Main {
 //				System.out.println(a.toString());
 //			};
 			
-//			if(transfer(2, 1, 500)) {
-//				BankAccount fromBa = getAccount(1);
-//				BankAccount toBa = getAccount(2);
-//				System.out.println(fromBa.toString());
-//				System.out.println(toBa.toString());
-//			};
+			if(transfer(1, 2, 500)) {
+				BankAccount fromBa = getAccount(1);
+				BankAccount toBa = getAccount(2);
+				System.out.println(fromBa.toString());
+				System.out.println(toBa.toString());
+			};
 			
 //			if(removeAccount(1)){
 //				for(BankAccount ba : bankAccounts) {
@@ -335,12 +375,14 @@ public class Main {
 	public static boolean transfer(int fromNumID, int toNumID, float amount) {
 		BankAccount fromBa = getAccount(fromNumID);
 		BankAccount toBa = getAccount(toNumID);
-		if(fromBa.withdraw(amount)) {
+		
+		if(fromBa.withdraw(amount)){
 			toBa.deposit(amount);			
 		} else {
 			System.out.println("Insufficient fund. Transfer unsuccesfully!");
 			return false;
 		}
+		
 		if(updateBalance(fromBa.getBalance(), fromNumID) && updateBalance(toBa.getBalance(), toNumID)){
 			System.out.println("Transfer succesfully!");			
 			return true;
@@ -351,7 +393,7 @@ public class Main {
 		}
 	}
 	
-	
+																																									
 	public static boolean deposit(int accountNumID, float amount) {
 		BankAccount ba = getAccount(accountNumID);
 		ba.deposit(amount);
