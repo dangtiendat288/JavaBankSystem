@@ -1,7 +1,5 @@
 package bankSystem;
 
-import java.awt.EventQueue;
-
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;

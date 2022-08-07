@@ -16,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -25,12 +24,11 @@ import java.awt.Color;
 
 public class LoginScreen {
 
-	static private JFrame frame;
-	static private JTextField edtUsername;
-	static private JTextField edtPassword;
+	private JFrame frame;
+	private JTextField edtUsername;
+	private JTextField edtPassword;
 	
-	static ArrayList<BankAccount> bankAccounts = new ArrayList<>();
-	static Customer currentCustomer;
+	Customer currentCustomer;
 	static Connection currentConn;
 
 	public static void main(String[] args) {
@@ -55,7 +53,7 @@ public class LoginScreen {
 			public void run() {
 				try {
 					LoginScreen window = new LoginScreen();
-					LoginScreen.frame.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -167,11 +165,7 @@ public class LoginScreen {
 		}
 	}
 	
-	public static boolean createCustomer(String username, String password) {
-//		String sql = "INSERT INTO customers (username, password)"
-//				+ " VALUES ('" + customer.getUsername() 
-//				+ "', '" + customer.getPassword()
-//				+ "')";
+	public boolean createCustomer(String username, String password) {
 		
 		String query = "INSERT INTO customers (username, password) VALUES (?, ?)";
 		
@@ -191,7 +185,7 @@ public class LoginScreen {
 		}	
 	}
 	
-	public static boolean login(String usernameInput, String passwordInput) {
+	public boolean login(String usernameInput, String passwordInput) {
 		String query = String.format("SELECT * FROM customers WHERE username = '%s' AND password = '%s'",usernameInput, passwordInput);
 		try {
 			Statement statement = currentConn.createStatement();

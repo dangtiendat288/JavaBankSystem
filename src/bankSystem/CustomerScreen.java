@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,20 +22,20 @@ import javax.swing.JButton;
 
 public class CustomerScreen {
 
-	private static JFrame frame;
+	private JFrame frame;
 	private JTextField edtAmount;
 	
-	static ArrayList<BankAccount> bankAccounts = new ArrayList<>();
 	static Customer currentCustomer;
 	static Connection currentConn;
+	static ArrayList<BankAccount> bankAccounts = new ArrayList<>();
 	static DefaultListModel<BankAccount> listAccountModel;
-	static JList<BankAccount> accountList;
+	JList<BankAccount> accountList;
 	
 	
 	public CustomerScreen(Connection currentConn, Customer currentCustomer) {
 		
-		this.currentCustomer = currentCustomer;
-		this.currentConn = currentConn;		
+		CustomerScreen.currentCustomer = currentCustomer;
+		CustomerScreen.currentConn = currentConn;		
 		initialize();
 		refreshAccounts();
 		
@@ -246,7 +245,7 @@ public class CustomerScreen {
 		}			
 	}
 	
-	public static Customer getCustomer(int IDInput){
+	public Customer getCustomer(int IDInput){
 		String query = "SELECT * FROM customers WHERE id = " + IDInput;
 		try {
 			Statement statement = currentConn.createStatement();
@@ -267,7 +266,7 @@ public class CustomerScreen {
 		}			
 	}
 	
-	public static boolean deposit(int accountNumID, float amount) {
+	public boolean deposit(int accountNumID, float amount) {
 		BankAccount ba = getAccount(accountNumID);
 		System.out.println("Deposit to:" + ba);
 		ba.deposit(amount);
@@ -283,7 +282,7 @@ public class CustomerScreen {
 		}
 	}
 
-	public static boolean withdraw(int accountNumID, float amount) {
+	public boolean withdraw(int accountNumID, float amount) {
 		BankAccount ba = getAccount(accountNumID);		
 		if(ba.withdraw(amount)) {
 			updateBalance(ba.getBalance(), accountNumID); 
@@ -314,8 +313,8 @@ public class CustomerScreen {
 		}		
 	}
 	
-	public boolean removeAccount(int accountID) {
-		String query = String.format("DELETE FROM accounts WHERE accnum = %d", accountID);
+	public boolean removeAccount(int accountNumID) {
+		String query = String.format("DELETE FROM accounts WHERE accnum = %d", accountNumID);
 		
 		try {
 			Statement statement = currentConn.createStatement();

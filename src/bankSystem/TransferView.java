@@ -1,7 +1,5 @@
 package bankSystem;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -23,7 +21,7 @@ public class TransferView {
 
 	static Customer currentCustomer;
 	static Connection currentConn;
-	static int fromAccount;
+	int fromAccount;
 
 	public TransferView(Connection connection, Customer customer, int fromAccount) {
 		currentConn = connection;
