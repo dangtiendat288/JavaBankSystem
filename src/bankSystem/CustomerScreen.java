@@ -38,15 +38,6 @@ public class CustomerScreen {
 		this.currentCustomer = currentCustomer;
 		this.currentConn = currentConn;		
 		initialize();
-		BankAccount b = currentCustomer.createAccount("checking", currentCustomer.getID());
-		BankAccount c = currentCustomer.createAccount("savings", currentCustomer.getID());
-		
-//		if(createAccount(b)) {
-//			System.out.println("Created account successfully!\n");
-//		};
-//		if(createAccount(c)) {
-//			System.out.println("Created account successfully!\n");
-//		};
 		refreshAccounts();
 		
 	}
@@ -91,6 +82,7 @@ public class CustomerScreen {
 		frame.getContentPane().add(lblCustomerName);
 		
 		edtAmount = new JTextField();
+		edtAmount.setText("Amount");
 		edtAmount.setFont(new Font("Arial", Font.BOLD, 15));
 		edtAmount.setBounds(30, 311, 132, 40);
 		frame.getContentPane().add(edtAmount);
@@ -99,14 +91,18 @@ public class CustomerScreen {
 		JButton btnDeposit = new JButton("Deposit");
 		btnDeposit.addActionListener((ActionListener) new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(accountList.getSelectedValue() == null) {
-					JOptionPane.showMessageDialog(frame, "Please select an account!");
-				}
-				else {
+				if(accountList.getSelectedValue() != null && edtAmount.getText().toString().length() != 0){
 					deposit(accountList.getSelectedValue().getNumber(), Float.valueOf(edtAmount.getText()));
 					edtAmount.setText("");
 					refreshAccounts();
-				}
+				} else {				
+					if(accountList.getSelectedValue() == null) {
+						JOptionPane.showMessageDialog(frame, "Please select an account!");
+					} 
+					if(edtAmount.getText().toString().length() == 0){
+						JOptionPane.showMessageDialog(frame, "Please enter an amount!");
+					}
+				}				
 			}
 		});
 		btnDeposit.setFont(new Font("Arial", Font.BOLD, 15));
@@ -116,13 +112,17 @@ public class CustomerScreen {
 		JButton btnWithdraw = new JButton("Withdraw");
 		btnWithdraw.addActionListener((ActionListener) new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(accountList.getSelectedValue() == null) {
-					JOptionPane.showMessageDialog(frame, "Please select an account!");
-				}
-				else {
+				if(accountList.getSelectedValue() != null && edtAmount.getText().toString().length() != 0){
 					withdraw(accountList.getSelectedValue().getNumber(), Float.valueOf(edtAmount.getText()));
 					edtAmount.setText("");
 					refreshAccounts();
+				} else {
+					if(accountList.getSelectedValue() == null) {
+						JOptionPane.showMessageDialog(frame, "Please select an account!");
+					} 
+					if(edtAmount.getText().toString().length() == 0){
+						JOptionPane.showMessageDialog(frame, "Please enter an amount!");
+					}
 				}
 			}
 		});
@@ -210,7 +210,7 @@ public class CustomerScreen {
 		}			
 	}
 	
-	public static ArrayList<Customer> getCustomers(){
+	public ArrayList<Customer> getCustomers(){
 		ArrayList<Customer> res = new ArrayList<>();
 		String query = "SELECT * FROM customers";
 		try {

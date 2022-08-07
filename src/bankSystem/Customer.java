@@ -54,9 +54,7 @@ public class Customer {
 	}
 	
 	public BankAccount createAccount(String type, int customerID) {
-		BankAccount ba = type.equals("checking")? new CheckingAccount(customerID): new SavingsAccount(customerID);
-//		ba.setNumber(accounts.size());
-//		accounts.add(ba);		
+		BankAccount ba = type.equals("checking")? new CheckingAccount(customerID): new SavingsAccount(customerID);	
 		return ba;
 	}
 	

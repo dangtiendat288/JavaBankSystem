@@ -53,22 +53,40 @@ public class TransferView {
 		edtToAccount = new JTextField();
 		edtToAccount.setText("To (Account Number)");
 		edtToAccount.setColumns(10);
-		edtToAccount.setBounds(164, 82, 176, 40);
+		edtToAccount.setBounds(181, 82, 159, 40);
 		frame.getContentPane().add(edtToAccount);
 		
 		JButton btnTransfer = new JButton("Transfer");
 		btnTransfer.addActionListener((ActionListener) new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(transfer(fromAccount, 
-						Integer.valueOf(edtToAccount.getText()), 
-						Float.valueOf(edtAmount.getText()))) {
-					frame.dispose();
-					CustomerScreen.refreshAccounts();
+				if(edtAmount.getText().toString().length() != 0 && edtToAccount.getText().toString().length() != 0){
+					if(transfer(fromAccount, 
+							Integer.valueOf(edtToAccount.getText()), 
+							Float.valueOf(edtAmount.getText()))) {
+						frame.dispose();
+						CustomerScreen.refreshAccounts();
+					}
+				} else {									
+					if(edtAmount.getText().toString().length() == 0){
+						JOptionPane.showMessageDialog(frame, "Please enter an amount!");
+					}
+					if(edtToAccount.getText().toString().length() == 0) {
+						JOptionPane.showMessageDialog(frame, "Please enter an account!");
+					}
 				}
+				
 			}
 		});
 		btnTransfer.setBounds(352, 83, 90, 40);
 		frame.getContentPane().add(btnTransfer);
+		
+		JLabel lbl$ = new JLabel("$");
+		lbl$.setBounds(6, 94, 14, 16);
+		frame.getContentPane().add(lbl$);
+		
+		JLabel lblNumber = new JLabel("#");
+		lblNumber.setBounds(164, 94, 14, 16);
+		frame.getContentPane().add(lblNumber);
 		
 		frame.setVisible(true);
 	}
