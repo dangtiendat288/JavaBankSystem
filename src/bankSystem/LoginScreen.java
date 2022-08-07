@@ -152,6 +152,7 @@ public class LoginScreen {
 	public static void createAccountsTable(Connection connection) {
 		String query = "CREATE TABLE IF NOT EXISTS accounts("
 				+ "numID serial PRIMARY KEY,"
+				+ "accNum int NOT NULL,"
 				+ "balance float(2),"
 				+ "type text NOT NULL,"		
 				+ "customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE"

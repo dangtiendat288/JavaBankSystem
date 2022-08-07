@@ -6,13 +6,12 @@ public abstract class BankAccount{
 	   protected double interestRate = 0.0;
 	   protected float balance = 0.0f;
 	   protected int customerID = -1;
-	   
+	   	   
 	   public BankAccount(String type, int customerID){
-	      this.type = type;
-	      this.customerID = customerID;
-	      //create numID
-	      // retrieve currentNumID from db then increase by 1
-	   }
+		      this.type = type;
+		      this.customerID = customerID;
+		      this.numID = (int) ((Math.random() * (99999 - 10000)) + 10000);		      
+		   }
 	   
 	   public String toString() {
 			return  String.format("%s Account #%d: $%.2f", type, numID, balance);									

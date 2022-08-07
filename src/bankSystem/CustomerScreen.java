@@ -38,6 +38,15 @@ public class CustomerScreen {
 		this.currentCustomer = currentCustomer;
 		this.currentConn = currentConn;		
 		initialize();
+		BankAccount b = currentCustomer.createAccount("checking", currentCustomer.getID());
+		BankAccount c = currentCustomer.createAccount("savings", currentCustomer.getID());
+		
+//		if(createAccount(b)) {
+//			System.out.println("Created account successfully!\n");
+//		};
+//		if(createAccount(c)) {
+//			System.out.println("Created account successfully!\n");
+//		};
 		refreshAccounts();
 		
 	}
@@ -124,7 +133,11 @@ public class CustomerScreen {
 		JButton btnTransfer = new JButton("Transfer");
 		btnTransfer.addActionListener((ActionListener) new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TransferView transferView = new TransferView(currentConn, currentCustomer, accountList.getSelectedValue().getNumber());
+				if(accountList.getSelectedValue() == null) {
+					JOptionPane.showMessageDialog(frame, "Please select a sender account!");
+				} else {
+					TransferView transferView = new TransferView(currentConn, currentCustomer, accountList.getSelectedValue().getNumber());
+				}
 			}
 		});
 		btnTransfer.setFont(new Font("Arial", Font.BOLD, 15));
@@ -132,6 +145,11 @@ public class CustomerScreen {
 		frame.getContentPane().add(btnTransfer);
 		
 		JButton btnNewAccount = new JButton("New Account");
+		btnNewAccount.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					CreateNewAccountView newAccView = new CreateNewAccountView(currentConn, currentCustomer);				
+			}
+		});
 		btnNewAccount.setFont(new Font("Arial", Font.BOLD, 15));
 		btnNewAccount.setBounds(271, 364, 117, 45);
 		frame.getContentPane().add(btnNewAccount);
@@ -151,7 +169,7 @@ public class CustomerScreen {
 			
 			ResultSet resultSet = statement.executeQuery(query);
 			while(resultSet.next()) {
-				int numID = resultSet.getInt("numid");
+				int numID = resultSet.getInt("accnum");
 				Float balance = resultSet.getFloat("balance");
 				String type = resultSet.getString("type");
 				int customerID = resultSet.getInt("customer_id");
@@ -169,13 +187,13 @@ public class CustomerScreen {
 	
 	public static BankAccount getAccount(int accountNumID){
 		BankAccount res = null;
-		String query = String.format("SELECT * FROM accounts WHERE customer_id = %d AND numid = %d", currentCustomer.getID(), accountNumID);
+		String query = String.format("SELECT * FROM accounts WHERE customer_id = %d AND accnum = %d", currentCustomer.getID(), accountNumID);
 		try {
 			Statement statement = currentConn.createStatement();
 			
 			ResultSet resultSet = statement.executeQuery(query);
 			while(resultSet.next()){
-				int numID = resultSet.getInt("numid");
+				int numID = resultSet.getInt("accnum");
 				float balance = resultSet.getFloat("balance");
 				String type = resultSet.getString("type");
 				int customerID = resultSet.getInt("customer_id");
@@ -234,24 +252,9 @@ public class CustomerScreen {
 		}			
 	}
 	
-	public static boolean createAccount(BankAccount account) {
-		String query = "INSERT INTO accounts (balance, type, customer_id) VALUES (?, ?, ?)";
-		
-		try {
-			PreparedStatement statement = currentConn.prepareStatement(query);
-			statement.setFloat(1, account.getBalance());
-			statement.setString(2, account.getType());
-			statement.setInt(3, account.getCustomerID());
-			statement.executeUpdate();
-			return true;
-		} catch (SQLException e) {			 
-			e.printStackTrace();
-			return false;
-		}	
-	}	
-	
 	public static boolean deposit(int accountNumID, float amount) {
 		BankAccount ba = getAccount(accountNumID);
+		System.out.println("Deposit to:" + ba);
 		ba.deposit(amount);
 		if(updateBalance(ba.getBalance(), accountNumID)) {
 			System.out.println("Deposit succesfully!");
@@ -281,7 +284,7 @@ public class CustomerScreen {
 	}
 	
 	public static boolean updateBalance(float newBalance, int accountNumID) {
-		String query = String.format("UPDATE accounts SET balance = '%f' WHERE numid = %d", newBalance, accountNumID);
+		String query = String.format("UPDATE accounts SET balance = '%f' WHERE accnum = %d", newBalance, accountNumID);
 		
 		try {
 			Statement statement = currentConn.createStatement();
