@@ -2,9 +2,11 @@ package bankSystem;
 
 import javax.swing.JFrame;
 import javax.swing.JList;
-//import java.awt.BorderLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,37 +15,65 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JTextField;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 
 public class CustomerScreen {
 
-	private JFrame frame;
+	private static JFrame frame;
 	private JTextField edtAmount;
 	
 	static ArrayList<BankAccount> bankAccounts = new ArrayList<>();
 	static Customer currentCustomer;
 	static Connection currentConn;
-
+	static DefaultListModel<BankAccount> listAccountModel;
+	static JList<BankAccount> accountList;
+	
+	
 	public CustomerScreen(Connection currentConn, Customer currentCustomer) {
 		
 		this.currentCustomer = currentCustomer;
-		this.currentConn = currentConn;
+		this.currentConn = currentConn;		
 		initialize();
+		refreshAccounts();
+		
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	
+	public static void refreshAccounts() {
+		listAccountModel.removeAllElements();
+		bankAccounts = getAccounts();
+		for(BankAccount ba : bankAccounts) {
+			listAccountModel.addElement(ba);
+			System.out.println("Adding account:" + ba.toString());
+		}
+	};
+	
 	private void initialize() {
+		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 450);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JList list = new JList();
-		list.setBounds(20, 79, 410, 205);
-		frame.getContentPane().add(list);
+		accountList = new JList<>();
+		listAccountModel = new DefaultListModel<>();
+		accountList.setModel(listAccountModel);
+		accountList.addListSelectionListener( new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				System.out.println(accountList.getSelectedValue());
+			}
+		});
+		accountList.setBounds(20, 79, 410, 205);
+		frame.getContentPane().add(accountList);
+		
 		
 		JLabel lblCustomerName = new JLabel(currentCustomer.getUsername());
 		lblCustomerName.setHorizontalAlignment(SwingConstants.CENTER);
@@ -53,29 +83,62 @@ public class CustomerScreen {
 		
 		edtAmount = new JTextField();
 		edtAmount.setFont(new Font("Arial", Font.BOLD, 15));
-		edtAmount.setBounds(20, 311, 142, 40);
+		edtAmount.setBounds(30, 311, 132, 40);
 		frame.getContentPane().add(edtAmount);
 		edtAmount.setColumns(10);
 		
 		JButton btnDeposit = new JButton("Deposit");
+		btnDeposit.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(accountList.getSelectedValue() == null) {
+					JOptionPane.showMessageDialog(frame, "Please select an account!");
+				}
+				else {
+					deposit(accountList.getSelectedValue().getNumber(), Float.valueOf(edtAmount.getText()));
+					edtAmount.setText("");
+					refreshAccounts();
+				}
+			}
+		});
 		btnDeposit.setFont(new Font("Arial", Font.BOLD, 15));
 		btnDeposit.setBounds(186, 308, 117, 45);
 		frame.getContentPane().add(btnDeposit);
 		
 		JButton btnWithdraw = new JButton("Withdraw");
+		btnWithdraw.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(accountList.getSelectedValue() == null) {
+					JOptionPane.showMessageDialog(frame, "Please select an account!");
+				}
+				else {
+					withdraw(accountList.getSelectedValue().getNumber(), Float.valueOf(edtAmount.getText()));
+					edtAmount.setText("");
+					refreshAccounts();
+				}
+			}
+		});
 		btnWithdraw.setFont(new Font("Arial", Font.BOLD, 15));
 		btnWithdraw.setBounds(318, 308, 117, 45);
 		frame.getContentPane().add(btnWithdraw);
 		
 		JButton btnTransfer = new JButton("Transfer");
+		btnTransfer.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TransferView transferView = new TransferView(currentConn, currentCustomer, accountList.getSelectedValue().getNumber());
+			}
+		});
 		btnTransfer.setFont(new Font("Arial", Font.BOLD, 15));
 		btnTransfer.setBounds(69, 364, 117, 45);
 		frame.getContentPane().add(btnTransfer);
 		
-		JButton btnNewButton_1_1 = new JButton("New Account");
-		btnNewButton_1_1.setFont(new Font("Arial", Font.BOLD, 15));
-		btnNewButton_1_1.setBounds(271, 364, 117, 45);
-		frame.getContentPane().add(btnNewButton_1_1);
+		JButton btnNewAccount = new JButton("New Account");
+		btnNewAccount.setFont(new Font("Arial", Font.BOLD, 15));
+		btnNewAccount.setBounds(271, 364, 117, 45);
+		frame.getContentPane().add(btnNewAccount);
+		
+		JLabel lbl$ = new JLabel("$");
+		lbl$.setBounds(20, 323, 20, 16);
+		frame.getContentPane().add(lbl$);
 		
 		frame.setVisible(true);
 	}
@@ -140,8 +203,7 @@ public class CustomerScreen {
 				int ID = resultSet.getInt("id");
 				String username = resultSet.getString("username");
 				String password = resultSet.getString("password");				
-				Customer a = new Customer(ID, username, password);
-//				a.setPassword(password);
+				Customer a = new Customer(ID, username, password);				
 				res.add(a);
 			}
 			return res;
@@ -192,24 +254,28 @@ public class CustomerScreen {
 		BankAccount ba = getAccount(accountNumID);
 		ba.deposit(amount);
 		if(updateBalance(ba.getBalance(), accountNumID)) {
-			System.out.println("Deposit succesfully!");			
+			System.out.println("Deposit succesfully!");
+			JOptionPane.showMessageDialog(frame, "Deposit succesfully!");
 			return true;
 			
 		} else {
 			System.out.println("Deposit unsuccesfully!");
+			JOptionPane.showMessageDialog(frame, "Deposit unsuccesfully!");
 			return false;
 		}
 	}
 
 	public static boolean withdraw(int accountNumID, float amount) {
-		BankAccount ba = getAccount(accountNumID);
-		ba.withdraw(amount);
-		if(updateBalance(ba.getBalance(), accountNumID)) {
-			System.out.println("Withdraw succesfully!");			
+		BankAccount ba = getAccount(accountNumID);		
+		if(ba.withdraw(amount)) {
+			updateBalance(ba.getBalance(), accountNumID); 
+			System.out.println("Withdraw succesfully!");
+			JOptionPane.showMessageDialog(frame, "Withdraw succesfully!");
 			return true;
 			
 		} else {
 			System.out.println("Withdraw unsuccesfully!");
+			JOptionPane.showMessageDialog(frame, "Insufficient fund. Withdraw unsuccesfully!");
 			return false;
 		}
 	}
@@ -229,26 +295,4 @@ public class CustomerScreen {
 			return false;
 		}		
 	}
-
-	public static boolean transfer(int fromNumID, int toNumID, float amount) {
-		BankAccount fromBa = getAccount(fromNumID);
-		BankAccount toBa = getAccount(toNumID);
-		
-		if(fromBa.withdraw(amount)){
-			toBa.deposit(amount);			
-		} else {
-			System.out.println("Insufficient fund. Transfer unsuccesfully!");
-			return false;
-		}
-		
-		if(updateBalance(fromBa.getBalance(), fromNumID) && updateBalance(toBa.getBalance(), toNumID)){
-			System.out.println("Transfer succesfully!");			
-			return true;
-			
-		} else {
-			System.out.println("Transfer unsuccesfully!");
-			return false;
-		}
-	}
-
 }

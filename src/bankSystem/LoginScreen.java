@@ -55,7 +55,7 @@ public class LoginScreen {
 			public void run() {
 				try {
 					LoginScreen window = new LoginScreen();
-					window.frame.setVisible(true);
+					LoginScreen.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -212,104 +212,4 @@ public class LoginScreen {
 		}						
 	}
 
-	public static boolean updateName(String newName, int ID) {
-		String query = String.format("UPDATE customers SET username = '%s' WHERE id = %d", newName, ID);
-		
-		try {
-			Statement statement = currentConn.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Update successfully!");
-			currentCustomer = getCustomer(ID);
-			return true;
-		} catch (SQLException e) {			 
-			e.printStackTrace();
-			System.out.println("Update unsuccessfully!");
-			return false;
-		}		
-	}
-	
-	public static boolean updatePassword(String newPassword, int ID) {
-		String query = String.format("UPDATE customers SET password = '%s' WHERE id = %d", newPassword, ID);
-		
-		try {
-			Statement statement = currentConn.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Update successfully!");
-			currentCustomer = getCustomer(ID);
-			return true;
-		} catch (SQLException e) {			 
-			e.printStackTrace();
-			System.out.println("Update unsuccessfully!");
-			return false;
-		}		
-	}
-	
-	public static boolean removeAccount(int accountID) {
-		String query = String.format("DELETE FROM accounts WHERE numid = %d", accountID);
-		
-		try {
-			Statement statement = currentConn.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Remove successfully!");
-			bankAccounts = getAccounts();
-			return true;
-		} catch (SQLException e) {			 
-			e.printStackTrace();
-			System.out.println("Remove unsuccessfully!");
-			return false;
-		}		
-	}
-
-	public static boolean transfer(int fromNumID, int toNumID, float amount) {
-		BankAccount fromBa = getAccount(fromNumID);
-		BankAccount toBa = getAccount(toNumID);
-		
-		if(fromBa.withdraw(amount)){
-			toBa.deposit(amount);			
-		} else {
-			System.out.println("Insufficient fund. Transfer unsuccesfully!");
-			return false;
-		}
-		
-		if(updateBalance(fromBa.getBalance(), fromNumID) && updateBalance(toBa.getBalance(), toNumID)){
-			System.out.println("Transfer succesfully!");			
-			return true;
-			
-		} else {
-			System.out.println("Transfer unsuccesfully!");
-			return false;
-		}
-	}
-																																							
-	
-	
-	public static boolean withdraw(int accountNumID, float amount) {
-		BankAccount ba = getAccount(accountNumID);
-		ba.withdraw(amount);
-		if(updateBalance(ba.getBalance(), accountNumID)) {
-			System.out.println("Withdraw succesfully!");			
-			return true;
-			
-		} else {
-			System.out.println("Withdraw unsuccesfully!");
-			return false;
-		}
-	}
-	
-	
-	public static boolean updateBalance(float newBalance, int accountNumID) {
-		String query = String.format("UPDATE accounts SET balance = '%f' WHERE numid = %d", newBalance, accountNumID);
-		
-		try {
-			Statement statement = currentConn.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Update balance successfully!");
-			bankAccounts = getAccounts();
-			return true;
-		} catch (SQLException e) {			 
-			e.printStackTrace();
-			System.out.println("Update balance unsuccessfully!");
-			return false;
-		}		
-	}
 }

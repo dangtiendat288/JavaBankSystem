@@ -15,10 +15,7 @@ public abstract class BankAccount{
 	   }
 	   
 	   public String toString() {
-			return "numID: " + numID + "\n" 
-						+ "balance: $" + balance + "\n" 
-						+ "type: " + type + "\n" 
-						+ "customer ID: " + customerID + "\n";						
+			return  String.format("%s Account #%d: $%.2f", type, numID, balance);									
 		}
 	   
 	   public int getNumber(){		      
