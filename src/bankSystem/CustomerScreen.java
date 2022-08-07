@@ -83,7 +83,7 @@ public class CustomerScreen {
 		
 		edtAmount = new JTextField();
 		edtAmount.setText("Amount");
-		edtAmount.setFont(new Font("Arial", Font.BOLD, 15));
+		edtAmount.setFont(new Font("Arial", Font.PLAIN, 15));
 		edtAmount.setBounds(30, 311, 132, 40);
 		frame.getContentPane().add(edtAmount);
 		edtAmount.setColumns(10);
@@ -141,7 +141,7 @@ public class CustomerScreen {
 			}
 		});
 		btnTransfer.setFont(new Font("Arial", Font.BOLD, 15));
-		btnTransfer.setBounds(69, 364, 117, 45);
+		btnTransfer.setBounds(20, 365, 117, 45);
 		frame.getContentPane().add(btnTransfer);
 		
 		JButton btnNewAccount = new JButton("New Account");
@@ -151,12 +151,27 @@ public class CustomerScreen {
 			}
 		});
 		btnNewAccount.setFont(new Font("Arial", Font.BOLD, 15));
-		btnNewAccount.setBounds(271, 364, 117, 45);
+		btnNewAccount.setBounds(170, 365, 117, 45);
 		frame.getContentPane().add(btnNewAccount);
 		
 		JLabel lbl$ = new JLabel("$");
 		lbl$.setBounds(20, 323, 20, 16);
 		frame.getContentPane().add(lbl$);
+		
+		JButton btnRemoveAcc = new JButton("Remove Acc");
+		btnRemoveAcc.addActionListener((ActionListener) new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(accountList.getSelectedValue() == null) {
+					JOptionPane.showMessageDialog(frame, "Please select an account to remove!");
+				} else {
+					removeAccount(accountList.getSelectedValue().getNumber());
+					refreshAccounts();
+				}					
+			}
+		});
+		btnRemoveAcc.setFont(new Font("Arial", Font.BOLD, 15));
+		btnRemoveAcc.setBounds(318, 365, 117, 45);
+		frame.getContentPane().add(btnRemoveAcc);
 		
 		frame.setVisible(true);
 	}
@@ -295,6 +310,24 @@ public class CustomerScreen {
 		} catch (SQLException e) {			 
 			e.printStackTrace();
 			System.out.println("Update balance unsuccessfully!");
+			return false;
+		}		
+	}
+	
+	public boolean removeAccount(int accountID) {
+		String query = String.format("DELETE FROM accounts WHERE accnum = %d", accountID);
+		
+		try {
+			Statement statement = currentConn.createStatement();
+			statement.executeUpdate(query);
+			JOptionPane.showMessageDialog(frame, "Remove account successfully!");
+			System.out.println("Remove account successfully!");
+			bankAccounts = getAccounts();
+			return true;
+		} catch (SQLException e) {			 
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(frame, "Remove account unsuccessfully!");
+			System.out.println("Remove account unsuccessfully!");
 			return false;
 		}		
 	}
